@@ -21,23 +21,23 @@ namespace CaseFitEditor
 
             Dictionary<string, ItemDefinition> items = new()
             {
-                { "Pistol", MakeItem("Pistol", "ปืนพก", 2, 2) },
-                { "AmmoBox", MakeItem("AmmoBox", "กล่องกระสุน", 2, 1) },
-                { "Herb", MakeItem("Herb", "สมุนไพร", 1, 1) },
-                { "Shell", MakeItem("Shell", "ลูกซองเปลือย", 1, 1) },
-                { "Smg", MakeItem("Smg", "ปืนกลมือ", 3, 1) },
-                { "Crowbar", MakeItem("Crowbar", "ชะแลง", 3, 1) },
-                { "AmmoBelt", MakeItem("AmmoBelt", "แถบกระสุน", 3, 1) },
-                { "Torch", MakeItem("Torch", "ไฟฉาย", 3, 1) },
-                { "Medkit", MakeItem("Medkit", "ชุดปฐมพยาบาล", 2, 2) },
-                { "Rifle", MakeItem("Rifle", "ไรเฟิลยาว", 3, 1) },
-                { "Shotgun", MakeItem("Shotgun", "ลูกซองยาว", 3, 1) },
-                { "AmmoCrate", MakeItem("AmmoCrate", "ลังกระสุน", 2, 2) },
-                { "FuelCan", MakeItem("FuelCan", "ถังเชื้อเพลิง", 2, 2) },
+                { "Pistol", MakeItem("Pistol", "Handgun", 2, 2) },
+                { "AmmoBox", MakeItem("AmmoBox", "Ammo Box", 2, 1) },
+                { "Herb", MakeItem("Herb", "Green Herb", 1, 1) },
+                { "Shell", MakeItem("Shell", "Shotgun Shells", 1, 1) },
+                { "Smg", MakeItem("Smg", "SMG", 3, 1) },
+                { "Crowbar", MakeItem("Crowbar", "Crowbar", 3, 1) },
+                { "AmmoBelt", MakeItem("AmmoBelt", "Ammo Belt", 3, 1) },
+                { "Torch", MakeItem("Torch", "Flashlight", 3, 1) },
+                { "Medkit", MakeItem("Medkit", "First Aid Kit", 2, 2) },
+                { "Rifle", MakeItem("Rifle", "Rifle", 3, 1) },
+                { "Shotgun", MakeItem("Shotgun", "Shotgun", 3, 1) },
+                { "AmmoCrate", MakeItem("AmmoCrate", "Ammo Crate", 2, 2) },
+                { "FuelCan", MakeItem("FuelCan", "Fuel Can", 2, 2) },
             };
 
-            MakeLevel("Level_01", "บ้านร้างหลังแรก", 3, 60f, 6,
-                "ของ 5 ชิ้น ช่องว่าง 9 ช่อง พอดีเป๊ะ ไม่มีที่ให้พลาด",
+            MakeLevel("Level_01", "Abandoned House", 3, 60f, 6,
+                "Five items, nine slots. An exact fit - there is no room for a wasted cell.",
                 new (ItemDefinition, int)[]
                 {
                     (items["Pistol"], 1),
@@ -46,8 +46,8 @@ namespace CaseFitEditor
                     (items["Shell"], 1),
                 });
 
-            MakeLevel("Level_02", "โกดังริมทะเลสาบ", 4, 120f, 7,
-                "ของยาว 4 ชิ้น กับกล่องใหญ่ 1 ใบ ไม่มีชิ้นเล็กให้อุดรูเลย ลองคิดใหม่ว่ากล่องใหญ่ไม่จำเป็นต้องอยู่ที่มุม",
+            MakeLevel("Level_02", "Lakeside Warehouse", 4, 120f, 7,
+                "Four long items and one big box. Nothing small to plug the gaps - the big box does not have to sit in a corner.",
                 new (ItemDefinition, int)[]
                 {
                     (items["Smg"], 1),
@@ -57,8 +57,8 @@ namespace CaseFitEditor
                     (items["Medkit"], 1),
                 });
 
-            MakeLevel("Level_03", "คลังใต้ปราสาท", 5, 210f, 10,
-                "ของยาว 3 ชิ้น กล่องสี่เหลี่ยม 4 ใบ ทั้งกระเป๋ามีทางลงอยู่แค่ไม่กี่ทาง",
+            MakeLevel("Level_03", "Castle Storeroom", 5, 210f, 10,
+                "Three long items and four square ones. The whole case has only a handful of valid packings.",
                 new (ItemDefinition, int)[]
                 {
                     (items["Rifle"], 1),
