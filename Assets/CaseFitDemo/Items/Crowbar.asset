@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 08aac687bf014c1408a6e2ad41c7e418, type: 3}
   m_Name: Crowbar
   m_EditorClassIdentifier: Assembly-CSharp::CaseFit.ItemDefinition
-  displayName: "\u0E0A\u0E30\u0E41\u0E25\u0E07"
+  displayName: Crowbar
   width: 3
   height: 1
   canRotate: 1

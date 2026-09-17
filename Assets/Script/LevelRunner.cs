@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.SceneManagement;
 
 namespace CaseFit
 {
@@ -29,6 +30,10 @@ namespace CaseFit
         [Header("Options")]
         [SerializeField] bool chillMode;
 
+        [Header("Ending")]
+        [SerializeField] string winSceneName = "Win";
+        [SerializeField] float winSceneDelay = 2.5f;
+
         [Header("Events")]
         public LevelEvent onLevelLoaded = new();
         public FloatEvent onTimeChanged = new();
@@ -37,6 +42,7 @@ namespace CaseFit
         public IntEvent onLevelCleared = new();
         public UnityEvent onLevelFailed = new();
         public UnityEvent onStuck = new();
+        public UnityEvent onGameCompleted = new();
 
         public int CurrentIndex { get; private set; }
         public float TimeLeft { get; private set; }
@@ -50,6 +56,22 @@ namespace CaseFit
             set => chillMode = value;
         }
 
+        public int TotalStars
+        {
+            get
+            {
+                int total = 0;
+                foreach (int value in starsPerLevel) total += value;
+                return total;
+            }
+        }
+
+        public int MaxStars => levels.Count * 3;
+        public bool IsLastLevel => CurrentIndex >= levels.Count - 1;
+        public int Moves => dragController != null ? dragController.Moves : 0;
+        public int Remaining => RemainingCount();
+
+        int[] starsPerLevel = new int[0];
         readonly List<ItemView> spawnedViews = new();
         readonly List<ItemInstance> spawnedItems = new();
         bool stuckReported;
@@ -66,7 +88,12 @@ namespace CaseFit
 
         void Start()
         {
-            if (autoStart) LoadLevel(startIndex);
+            if (!autoStart)
+            {
+                Debug.LogWarning("[Case Fit] LevelRunner: 'Auto Start' is off, so no level is loaded. Tick it, or call LoadLevel() yourself.", this);
+                return;
+            }
+            LoadLevel(startIndex);
         }
 
         void Update()
@@ -82,9 +109,55 @@ namespace CaseFit
             onTimeChanged?.Invoke(TimeLeft);
         }
 
+        public bool ValidateReferences()
+        {
+            bool ok = true;
+
+            if (inventoryCase == null)
+            {
+                Debug.LogError("[Case Fit] LevelRunner: field 'Inventory Case' is empty. Drag the Case object into it.", this);
+                ok = false;
+            }
+            else if (inventoryCase.GetComponent<GridLayout3D>() == null)
+            {
+                Debug.LogError("[Case Fit] LevelRunner: the Case object has no GridLayout3D component.", inventoryCase);
+                ok = false;
+            }
+
+            if (tray == null)
+            {
+                Debug.LogError("[Case Fit] LevelRunner: field 'Tray' is empty. Drag the Tray object into it.", this);
+                ok = false;
+            }
+
+            if (dragController == null)
+            {
+                Debug.LogError("[Case Fit] LevelRunner: field 'Drag Controller' is empty.", this);
+                ok = false;
+            }
+
+            if (levels.Count == 0)
+            {
+                Debug.LogError("[Case Fit] LevelRunner: the 'Levels' list is empty. Add at least one Level Definition.", this);
+                ok = false;
+            }
+
+            for (int i = 0; i < levels.Count; i++)
+            {
+                if (levels[i] != null) continue;
+                Debug.LogError($"[Case Fit] LevelRunner: 'Levels' element {i} is empty (None). Drag a Level Definition asset into it.", this);
+                ok = false;
+            }
+
+            return ok;
+        }
+
         public void LoadLevel(int index)
         {
-            if (levels.Count == 0) return;
+            if (!ValidateReferences()) return;
+
+            if (starsPerLevel.Length != levels.Count) starsPerLevel = new int[levels.Count];
+
             CurrentIndex = Mathf.Clamp(index, 0, levels.Count - 1);
             LevelDefinition level = levels[CurrentIndex];
 
@@ -104,13 +177,25 @@ namespace CaseFit
             onMovesChanged?.Invoke(0);
             onRemainingChanged?.Invoke(spawnedItems.Count);
 
-            if (autoBegin) BeginLevel();
+            if (autoBegin)
+            {
+                BeginLevel();
+            }
+            else
+            {
+                Debug.LogWarning("[Case Fit] LevelRunner: 'Auto Begin' is off, so the timer stays paused. Tick it, or call BeginLevel() from a button.", this);
+            }
         }
 
         public void BeginLevel()
         {
             Running = true;
             dragController.InputEnabled = true;
+
+            if (chillMode)
+                Debug.Log("[Case Fit] Chill mode is ON - the timer will not count down. Untick it to run the clock.", this);
+            else
+                Debug.Log($"[Case Fit] Level {CurrentIndex + 1} started. Timer: {TimeLeft:0} s", this);
         }
 
         public void ReloadLevel() => LoadLevel(CurrentIndex);
@@ -250,7 +335,38 @@ namespace CaseFit
         {
             Running = false;
             dragController.InputEnabled = false;
-            onLevelCleared?.Invoke(CalculateStars());
+
+            int stars = CalculateStars();
+            if (CurrentIndex >= 0 && CurrentIndex < starsPerLevel.Length)
+                starsPerLevel[CurrentIndex] = Mathf.Max(starsPerLevel[CurrentIndex], stars);
+
+            onLevelCleared?.Invoke(stars);
+
+            if (!IsLastLevel) return;
+
+            PlayerPrefs.SetInt("CaseFit_TotalStars", TotalStars);
+            PlayerPrefs.SetInt("CaseFit_MaxStars", MaxStars);
+            PlayerPrefs.SetString("CaseFit_GameScene", SceneManager.GetActiveScene().name);
+            PlayerPrefs.Save();
+
+            onGameCompleted?.Invoke();
+
+            if (!string.IsNullOrEmpty(winSceneName))
+                Invoke(nameof(LoadWinScene), Mathf.Max(0f, winSceneDelay));
+        }
+
+        public void LoadWinScene()
+        {
+            if (string.IsNullOrEmpty(winSceneName)) return;
+
+            if (!Application.CanStreamedLevelBeLoaded(winSceneName))
+            {
+                Debug.LogError($"[Case Fit] Scene '{winSceneName}' is not in the build list. " +
+                               "Add it in File > Build Profiles > Scene List.", this);
+                return;
+            }
+
+            SceneManager.LoadScene(winSceneName);
         }
 
         void Fail()

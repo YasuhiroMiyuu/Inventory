@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 08aac687bf014c1408a6e2ad41c7e418, type: 3}
   m_Name: Medkit
   m_EditorClassIdentifier: Assembly-CSharp::CaseFit.ItemDefinition
-  displayName: "\u0E0A\u0E38\u0E14\u0E1B\u0E10\u0E21\u0E1E\u0E22\u0E32\u0E1A\u0E32\u0E25"
+  displayName: First Aid Kit
   width: 2
   height: 2
   canRotate: 0

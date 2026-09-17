@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 08aac687bf014c1408a6e2ad41c7e418, type: 3}
   m_Name: Rifle
   m_EditorClassIdentifier: Assembly-CSharp::CaseFit.ItemDefinition
-  displayName: "\u0E44\u0E23\u0E40\u0E1F\u0E34\u0E25\u0E22\u0E32\u0E27"
+  displayName: Rifle
   width: 3
   height: 1
   canRotate: 1

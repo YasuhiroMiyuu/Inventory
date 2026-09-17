@@ -15,9 +15,8 @@ MonoBehaviour:
   gridSize: 3
   timeLimit: 60
   parMoves: 6
-  title: "\u0E1A\u0E49\u0E32\u0E19\u0E23\u0E49\u0E32\u0E07\u0E2B\u0E25\u0E31\u0E07\u0E41\u0E23\u0E01"
-  brief: "\u0E02\u0E2D\u0E07 5 \u0E0A\u0E34\u0E49\u0E19 \u0E0A\u0E48\u0E2D\u0E07\u0E27\u0E48\u0E32\u0E07
-    9 \u0E0A\u0E48\u0E2D\u0E07 \u0E1E\u0E2D\u0E14\u0E35\u0E40\u0E1B\u0E4A\u0E30 \u0E44\u0E21\u0E48\u0E21\u0E35\u0E17\u0E35\u0E48\u0E43\u0E2B\u0E49\u0E1E\u0E25\u0E32\u0E14"
+  title: Abandoned House
+  brief: Five items, nine slots. An exact fit - there is no room for a wasted cell.
   items:
   - item: {fileID: 11400000, guid: 6df0b8333d1b40c409fa2c568be93e86, type: 2}
     count: 1
