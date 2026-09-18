@@ -247,23 +247,7 @@ namespace CaseFit
                         entry.item.height * layout.StepY - layout.spacing.y,
                         itemThickness);
 
-                    GameObject visual;
-                    if (entry.item.prefab != null)
-                    {
-                        visual = Instantiate(entry.item.prefab, root.transform);
-                        visual.transform.localRotation = Quaternion.Euler(entry.item.prefabEuler);
-                        visual.transform.localScale = Vector3.one * entry.item.prefabScale;
-                    }
-                    else
-                    {
-                        visual = GameObject.CreatePrimitive(PrimitiveType.Cube);
-                        Destroy(visual.GetComponent<Collider>());
-                        visual.transform.SetParent(root.transform, false);
-                        visual.transform.localScale = new Vector3(
-                            box.size.x * 0.9f, box.size.y * 0.9f, itemThickness * 0.8f);
-                    }
-
-                    visual.transform.localPosition = Vector3.zero;
+                    GameObject visual = CreateVisual(entry.item, root.transform, box.size);
                     if (layer >= 0) SetLayerRecursively(visual, layer);
 
                     ItemView view = root.AddComponent<ItemView>();
@@ -272,6 +256,91 @@ namespace CaseFit
                     spawnedViews.Add(view);
                     spawnedItems.Add(instance);
                     tray.Add(view);
+                }
+            }
+        }
+
+        // Builds the model for one item and lines it up with its grid footprint.
+        // The model's own pivot is ignored: what gets centred is the middle of its
+        // geometry, so corner pivots and off-centre pivots both behave.
+        GameObject CreateVisual(ItemDefinition item, Transform parent, Vector3 footprint)
+        {
+            if (item.prefab == null)
+            {
+                GameObject cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                Destroy(cube.GetComponent<Collider>());
+                cube.transform.SetParent(parent, false);
+                cube.transform.localPosition = Vector3.zero;
+                cube.transform.localScale = new Vector3(
+                    footprint.x * 0.9f, footprint.y * 0.9f, itemThickness * 0.8f);
+                return cube;
+            }
+
+            GameObject visual = Instantiate(item.prefab, parent);
+            visual.transform.localPosition = Vector3.zero;
+            visual.transform.localRotation = Quaternion.Euler(item.prefabEuler);
+            visual.transform.localScale = Vector3.one;
+
+            float scale = Mathf.Max(0.0001f, item.prefabScale);
+
+            if (item.fitToFootprint && TryMeasure(parent, visual, out Bounds unit))
+            {
+                float fit = float.MaxValue;
+                if (unit.size.x > 0.0001f) fit = Mathf.Min(fit, footprint.x / unit.size.x);
+                if (unit.size.y > 0.0001f) fit = Mathf.Min(fit, footprint.y / unit.size.y);
+
+                if (fit < float.MaxValue) scale *= fit * item.fitMargin;
+            }
+
+            visual.transform.localScale = Vector3.one * Mathf.Max(0.0001f, scale);
+
+            if (item.autoCenter && TryMeasure(parent, visual, out Bounds placed))
+                visual.transform.localPosition = -placed.center;
+
+            visual.transform.localPosition += item.prefabOffset;
+            return visual;
+        }
+
+        // Measures the model's geometry in the item root's own space, so a tilted
+        // case or a rotated tray does not throw the numbers off.
+        static bool TryMeasure(Transform space, GameObject target, out Bounds bounds)
+        {
+            bounds = new Bounds();
+            bool any = false;
+
+            foreach (MeshFilter filter in target.GetComponentsInChildren<MeshFilter>(true))
+                if (filter.sharedMesh != null)
+                    Accumulate(space, filter.transform, filter.sharedMesh.bounds, ref bounds, ref any);
+
+            foreach (SkinnedMeshRenderer skin in target.GetComponentsInChildren<SkinnedMeshRenderer>(true))
+                if (skin.sharedMesh != null)
+                    Accumulate(space, skin.transform, skin.sharedMesh.bounds, ref bounds, ref any);
+
+            return any;
+        }
+
+        static void Accumulate(Transform space, Transform source, Bounds local, ref Bounds bounds, ref bool any)
+        {
+            Vector3 center = local.center;
+            Vector3 extents = local.extents;
+
+            for (int i = 0; i < 8; i++)
+            {
+                Vector3 corner = center + new Vector3(
+                    (i & 1) == 0 ? -extents.x : extents.x,
+                    (i & 2) == 0 ? -extents.y : extents.y,
+                    (i & 4) == 0 ? -extents.z : extents.z);
+
+                Vector3 point = space.InverseTransformPoint(source.TransformPoint(corner));
+
+                if (!any)
+                {
+                    bounds = new Bounds(point, Vector3.zero);
+                    any = true;
+                }
+                else
+                {
+                    bounds.Encapsulate(point);
                 }
             }
         }

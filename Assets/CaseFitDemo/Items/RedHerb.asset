@@ -16,6 +16,10 @@ MonoBehaviour:
   width: 1
   height: 1
   canRotate: 0
-  prefab: {fileID: 0}
+  prefab: {fileID: 4460025821737843486, guid: 4ea1d448af0099a498e76235c0b03878, type: 3}
   prefabEuler: {x: 0, y: 0, z: 0}
   prefabScale: 1
+  autoCenter: 1
+  fitToFootprint: 1
+  fitMargin: 0.9
+  prefabOffset: {x: 0, y: 0, z: 0}
