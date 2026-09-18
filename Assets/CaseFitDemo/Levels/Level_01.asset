@@ -23,6 +23,8 @@ MonoBehaviour:
   - item: {fileID: 11400000, guid: f8e658162fcb5034bbbc7858c25b7c4d, type: 2}
     count: 1
   - item: {fileID: 11400000, guid: 6540b412c5f430842afae1fbb1043587, type: 2}
-    count: 2
-  - item: {fileID: 11400000, guid: fa2aed8f935e4044fbf8f6481a3141cb, type: 2}
+    count: 1
+  - item: {fileID: 11400000, guid: 7fe7db89b224e41418b79f171503b2c9, type: 2}
+    count: 1
+  - item: {fileID: 11400000, guid: d850cf822d3f77847ac9f2a6a718ce49, type: 2}
     count: 1

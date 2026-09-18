@@ -12,6 +12,10 @@ namespace CaseFitEditor
         const string ItemFolder = Root + "/Items";
         const string LevelFolder = Root + "/Levels";
 
+        // Items that were removed from the demo. Their assets are deleted so they
+        // do not linger in the project with no level pointing at them.
+        static readonly string[] RetiredItems = { "AmmoBelt", "AmmoCrate" };
+
         [MenuItem("Tools/Case Fit/Create Demo Levels")]
         public static void CreateDemoAssets()
         {
@@ -24,39 +28,44 @@ namespace CaseFitEditor
                 { "Pistol", MakeItem("Pistol", "Handgun", 2, 2) },
                 { "AmmoBox", MakeItem("AmmoBox", "Ammo Box", 2, 1) },
                 { "Herb", MakeItem("Herb", "Green Herb", 1, 1) },
+                { "RedHerb", MakeItem("RedHerb", "Red Herb", 1, 1) },
+                { "YellowHerb", MakeItem("YellowHerb", "Yellow Herb", 1, 1) },
                 { "Shell", MakeItem("Shell", "Shotgun Shells", 1, 1) },
                 { "Smg", MakeItem("Smg", "SMG", 3, 1) },
                 { "Crowbar", MakeItem("Crowbar", "Crowbar", 3, 1) },
-                { "AmmoBelt", MakeItem("AmmoBelt", "Ammo Belt", 3, 1) },
                 { "Torch", MakeItem("Torch", "Flashlight", 3, 1) },
                 { "Medkit", MakeItem("Medkit", "First Aid Kit", 2, 2) },
                 { "Rifle", MakeItem("Rifle", "Rifle", 3, 1) },
                 { "Shotgun", MakeItem("Shotgun", "Shotgun", 3, 1) },
-                { "AmmoCrate", MakeItem("AmmoCrate", "Ammo Crate", 2, 2) },
+                { "GoldBars", MakeItem("GoldBars", "Gold Bars", 2, 2) },
                 { "FuelCan", MakeItem("FuelCan", "Fuel Can", 2, 2) },
             };
 
+            // 3x3 = 9 cells. Shapes: 2x2 + 2x1 + three 1x1. 16 valid packings.
             MakeLevel("Level_01", "Abandoned House", 3, 60f, 6,
                 "Five items, nine slots. An exact fit - there is no room for a wasted cell.",
                 new (ItemDefinition, int)[]
                 {
                     (items["Pistol"], 1),
                     (items["AmmoBox"], 1),
-                    (items["Herb"], 2),
-                    (items["Shell"], 1),
+                    (items["Herb"], 1),
+                    (items["RedHerb"], 1),
+                    (items["YellowHerb"], 1),
                 });
 
+            // 4x4 = 16 cells. Shapes: four 3x1 + one 2x2. Pinwheel layout, 2 valid packings.
             MakeLevel("Level_02", "Lakeside Warehouse", 4, 120f, 7,
                 "Four long items and one big box. Nothing small to plug the gaps - the big box does not have to sit in a corner.",
                 new (ItemDefinition, int)[]
                 {
                     (items["Smg"], 1),
                     (items["Crowbar"], 1),
-                    (items["AmmoBelt"], 1),
+                    (items["Shotgun"], 1),
                     (items["Torch"], 1),
                     (items["Medkit"], 1),
                 });
 
+            // 5x5 = 25 cells. Shapes: three 3x1 + four 2x2. Only 4 valid packings.
             MakeLevel("Level_03", "Castle Storeroom", 5, 210f, 10,
                 "Three long items and four square ones. The whole case has only a handful of valid packings.",
                 new (ItemDefinition, int)[]
@@ -66,13 +75,27 @@ namespace CaseFitEditor
                     (items["Crowbar"], 1),
                     (items["Medkit"], 1),
                     (items["Pistol"], 1),
-                    (items["AmmoCrate"], 1),
+                    (items["GoldBars"], 1),
                     (items["FuelCan"], 1),
                 });
+
+            DeleteRetiredItems();
 
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
             Debug.Log("[Case Fit] Demo items and levels created under " + Root);
+        }
+
+        static void DeleteRetiredItems()
+        {
+            foreach (string name in RetiredItems)
+            {
+                string path = $"{ItemFolder}/{name}.asset";
+                if (AssetDatabase.LoadAssetAtPath<ItemDefinition>(path) == null) continue;
+
+                AssetDatabase.DeleteAsset(path);
+                Debug.Log($"[Case Fit] Removed retired item asset: {path}");
+            }
         }
 
         static void EnsureFolder(string parent, string child)
