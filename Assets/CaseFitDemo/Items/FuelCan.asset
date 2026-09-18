@@ -17,7 +17,7 @@ MonoBehaviour:
   height: 2
   canRotate: 0
   prefab: {fileID: 1215395421967941289, guid: 3028bdafdc13c1c4a911990395bbbce8, type: 3}
-  prefabEuler: {x: 0, y: 0, z: 0}
+  prefabEuler: {x: 0, y: 90, z: 0}
   prefabScale: 1
   autoCenter: 1
   fitToFootprint: 1
