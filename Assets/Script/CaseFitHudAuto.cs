@@ -19,6 +19,8 @@ namespace CaseFit
         [Header("Parts")]
         [SerializeField] bool showButtons = true;
         [SerializeField] bool showChillToggle = true;
+        [Tooltip("Shows the R / right click / Esc reminder at the bottom of the screen.")]
+        [SerializeField] bool showControlHints = true;
 
         [Header("Style")]
         [SerializeField] Color boneColor = new(0.93f, 0.90f, 0.83f);
@@ -158,6 +160,21 @@ namespace CaseFit
             }
 
             if (showChillToggle) MakeChillToggle(root, new Vector2(40f, 40f));
+            if (showControlHints) MakeControlHints(root, new Vector2(40f, showChillToggle ? 100f : 40f));
+        }
+
+        void MakeControlHints(Transform parent, Vector2 position)
+        {
+            string key = ColorUtility.ToHtmlStringRGB(brassColor);
+
+            string text =
+                $"<color=#{key}>R</color> or <color=#{key}>RIGHT CLICK</color>  rotate item" +
+                $"        <color=#{key}>LEFT CLICK</color>  pick up / drop" +
+                $"        <color=#{key}>ESC</color>  back to tray";
+
+            TMP_Text hint = Label(parent, "ControlsHint", text, new Vector2(0f, 0f), position,
+                                  new Vector2(1100f, 34f), 20f, TextAlignmentOptions.Left, dimColor);
+            hint.richText = true;
         }
 
         TMP_Text Label(Transform parent, string name, string text, Vector2 anchor, Vector2 position,
